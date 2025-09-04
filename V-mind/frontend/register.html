@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Vmind | Your Learning Journey Starts Here</title>
+    
+    <!-- Modular styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/space-background.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/register.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Space background with Canvas -->
+    <div class="stars-bg">
+        <canvas id="space"></canvas>
+    </div>
+
+    <!-- Simplified navbar -->
+    <nav class="login-navbar">
+        <div class="login-nav-container">
+            <a href="index.html" class="login-nav-logo">Vmind</a>
+            <a href="index.html" class="back-link">
+                <span>←</span>
+                <span>Back to home</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main registration container -->
+    <div class="login-container">
+        <div class="login-card glass-effect">
+            <!-- Registration header -->
+            <div class="login-header">
+                <h1 class="login-logo">Vmind</h1>
+                <p class="login-subtitle">Join the learning adventure</p>
+            </div>
+
+            <!-- Registration form -->
+            <form class="login-form" id="registerForm">
+                <!-- Name field -->
+                <div class="form-group" id="nameGroup">
+                    <label for="name" class="form-label">Full name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="login-input"
+                        placeholder="Your full name"
+                        required
+                        autocomplete="name"
+                    >
+                    <span class="error-message" id="nameError">This field is required</span>
+                </div>
+
+                <!-- Email field -->
+                <div class="form-group" id="emailGroup">
+                    <label for="email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="login-input"
+                        placeholder="your@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                    <span class="error-message" id="emailError">This field is required</span>
+                </div>
+
+                <!-- Phone field -->
+                <div class="form-group" id="phoneGroup">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        class="login-input"
+                        placeholder="3001234567"
+                        autocomplete="tel"
+                    >
+                    <span class="error-message" id="phoneError"></span>
+                </div>
+
+                <!-- Password field -->
+                <div class="form-group" id="passwordGroup">
+                    <label for="password" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="login-input"
+                        placeholder="Minimum 6 characters"
+                        required
+                        autocomplete="new-password"
+                    >
+                    <span class="error-message" id="passwordError">This field is required</span>
+                </div>
+
+                <!-- Age field -->
+                <div class="form-group" id="ageGroup">
+                    <label for="age" class="form-label">Age</label>
+                    <input 
+                        type="number" 
+                        id="age" 
+                        name="age" 
+                        class="login-input"
+                        placeholder="Your age"
+                        min="13"
+                        max="120"
+                        required
+                    >
+                    <span class="error-message" id="ageError">This field is required</span>
+                </div>
+
+                <!-- Registration button -->
+                <button type="submit" class="login-button glow-effect" id="registerButton">
+                    <span class="button-text">Create account</span>
+                </button>
+            </form>
+
+            <!-- Footer with additional links -->
+            <div class="login-footer">
+                <div class="login-divider">
+                    <span>or</span>
+                </div>
+                <p>
+                    Already have an account? 
+                    <a href="login.html" class="login-link" id="loginLink">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modular scripts -->
+    <script src="js/test-users.js"></script>
+    <script src="js/login-space-warp.js"></script>
+    <script src="js/api-config.js"></script>
+    <script>
+        // Registration form validation and submission
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value,
+                age: parseInt(document.getElementById('age').value)
+            };
+
+            // Validations
+            let isValid = true;
+            
+            // Clear previous errors
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('error');
+            });
+            
+            // Validate name
+            if (formData.name.length < 2) {
+                showError('nameGroup', 'nameError', 'Name must be at least 2 characters long');
+                isValid = false;
+            }
+            
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                showError('emailGroup', 'emailError', 'Enter a valid email address');
+                isValid = false;
+            }
+            
+            // Validate password
+            if (formData.password.length < 6) {
+                showError('passwordGroup', 'passwordError', 'Password must be at least 6 characters long');
+                isValid = false;
+            }
+            
+            // Validate phone (optional but if entered must be valid)
+            if (formData.phone && !/^[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+                showError('phoneGroup', 'phoneError', 'Phone must have between 10 and 15 digits');
+                isValid = false;
+            }
+            
+            // Validate age
+            if (formData.age < 13 || formData.age > 120) {
+                showError('ageGroup', 'ageError', 'Age must be between 13 and 120 years');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Show loading state
+            const submitButton = document.getElementById('registerButton');
+            const originalText = submitButton.querySelector('.button-text').textContent;
+            submitButton.classList.add('loading');
+            submitButton.disabled = true;
+            
+            try {
+                // Call the real backend API
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_name: formData.name,
+                        email: formData.email,
+                        phone: formData.phone || null,
+                        passwords: formData.password,
+                        objetive: `User of ${formData.age} years`,
+                        preferred_language: 'en'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('User registered successfully:', result.data.user);
+                    
+                    // Temporarily save user data to use after the survey
+                    const tempUserData = {
+                        id: result.data.user.id,
+                        username: result.data.user.user_name,
+                        email: result.data.user.email,
+                        phone: result.data.user.phone,
+                        objetivo: result.data.user.objetive,
+                        preferred_language: result.data.user.preferred_language
+                    };
+                    localStorage.setItem('tempUserData', JSON.stringify(tempUserData));
+                    
+                    // Show success message
+                    showSuccess('Account created successfully! Redirecting to survey...');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'survey.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Error creating account');
+                }
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError('emailGroup', 'emailError', 'Error creating account. Try again.');
+                
+                // Restore button
+                submitButton.classList.remove('loading');
+                submitButton.disabled = false;
+            }
+        });
+        
+        function showError(groupId, errorId, message) {
+            const group = document.getElementById(groupId);
+            const errorElement = document.getElementById(errorId);
+            
+            group.classList.add('error');
+            errorElement.textContent = message;
+        }
+        
+        // Function to show success messages
+        function showSuccess(message) {
+            // Create a success toast
+            const toast = document.createElement('div');
+            toast.className = 'success-toast';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Hover effects on inputs (same as login)
+        document.querySelectorAll('.login-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+                // Clear error on focus
+                this.parentElement.classList.remove('error');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+            
+            // Clear error on input
+            input.addEventListener('input', function() {
+                this.parentElement.classList.remove('error');
+            });
+        });
+        
+        // Add styles for animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
